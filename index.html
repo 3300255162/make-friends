@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交个朋友吧!</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #e6f3ff;
+            font-family: "Microsoft YaHei", sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 100%;
+        }
+
+        .top-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .avatar {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+        }
+
+        .question {
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+
+        .yes-btn {
+            padding: 8px 30px;
+            font-size: 18px;
+            background-color: #ffa6b6;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+
+        .no-btn {
+            padding: 8px 30px;
+            font-size: 18px;
+            background-color: #8899aa;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 20px;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-content">
+            <img src="images/1.png" alt="可爱的动漫头像" class="avatar">
+            <div class="question">可以和我做朋友吗？</div>
+        </div>
+        <div class="buttons">
+            <button class="yes-btn">可以</button>
+            <button class="no-btn">不行</button>
+        </div>
+    </div>
+
+    <script>
+        const topContent = document.querySelector('.top-content');
+        const yesBtn = document.querySelector('.yes-btn');
+        const noBtn = document.querySelector('.no-btn');
+        const avatar = document.querySelector('.avatar');
+        const noBtnTexts = [
+            '不要',
+            '？真的不考虑一下',
+            '不行o(╥﹏╥)o',
+            '我要生气啦！',
+            '不许选这个！',
+            '再给你一次机会',
+            '不行',
+            '不行',
+            '不行'
+        ];
+        let clickCount = 0;
+
+        // 计算上移距离
+        function calculateMoveDistance(clicks) {
+            switch(clicks) {
+                case 1: return 20;
+                case 2: return 25;
+                case 3: return 30;
+                case 4: return 40;
+                default: return 40; // 后续点击保持40px的移动距离
+            }
+        }
+
+        // 计算"不行"按钮的累计右移距离
+        function calculateMarginLeft(clicks) {
+            let totalMargin = 20; // 初始margin
+            for (let i = 1; i <= clicks; i++) {
+                totalMargin += (20 + i * 10); // 每次增加的距离都比上次多10px
+            }
+            return totalMargin;
+        }
+
+        noBtn.addEventListener('click', () => {
+            clickCount++;
+            
+            // 更新按钮文字
+            if (clickCount <= noBtnTexts.length) {
+                noBtn.textContent = noBtnTexts[clickCount - 1];
+            }
+            
+            // 在点击3次后切换头像图片
+            if (clickCount === 3) {
+                avatar.src = 'images/2.png';
+            }
+            
+            // 头像和问题上移，使用递增的距离
+            const moveDistance = calculateMoveDistance(clickCount);
+            const currentTransform = topContent.style.transform || '';
+            const currentTranslateY = currentTransform.match(/translateY\(([-\d.]+)px\)/) 
+                ? parseFloat(currentTransform.match(/translateY\(([-\d.]+)px\)/)[1])
+                : 0;
+            const newTranslateY = currentTranslateY - moveDistance;
+            topContent.style.transform = `translateY(${newTranslateY}px)`;
+            
+            // 更新"可以"按钮的大小，保持线性增长
+            const scale = 1 + (clickCount * 0.3); // 每次增加0.3
+            const padding = 8 + (clickCount * 8); // 每次增加8px
+            const fontSize = 18 + (clickCount * 3); // 每次增加3px
+            const horizontalPadding = 30 + (clickCount * 20); // 每次增加20px
+            
+            yesBtn.style.transform = `scale(${scale})`;
+            yesBtn.style.padding = `${padding}px ${horizontalPadding}px`;
+            yesBtn.style.fontSize = `${fontSize}px`;
+            
+            // 移动"不行"按钮，使用递增的移动距离
+            const marginLeft = calculateMarginLeft(clickCount);
+            const opacity = Math.max(1 - (clickCount - 4) * 0.2, 0); // 从第5次开始降低透明度
+            const btnScale = Math.max(1 - (clickCount - 4) * 0.1, 0.5); // 从第5次开始缩小
+            
+            noBtn.style.marginLeft = `${marginLeft}px`;
+            noBtn.style.opacity = opacity;
+            noBtn.style.transform = `scale(${btnScale})`;
+            
+            // 当按钮几乎不可见时禁用它
+            if (opacity < 0.2) {
+                noBtn.style.pointerEvents = 'none';
+            }
+        });
+
+        yesBtn.addEventListener('click', () => {
+            window.location.href = 'success.html';
+        });
+    </script>
+</body>
+</html> 
